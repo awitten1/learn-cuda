@@ -26,10 +26,10 @@ RssFile:	 4271512 kB
 RssShmem:	    8192 kB
 ```
 
-Then it starts counting towards GPU memory:
+Then it starts counting towards GPU memory (although confusingly, not to the add_cuda process):
 ```
 $ nvidia-smi
-Thu Jan 22 16:41:47 2026
+Thu Jan 22 16:26:47 2026
 +-----------------------------------------------------------------------------------------+
 | NVIDIA-SMI 590.48.01              Driver Version: 590.48.01      CUDA Version: 13.1     |
 +-----------------------------------------+------------------------+----------------------+
@@ -38,9 +38,19 @@ Thu Jan 22 16:41:47 2026
 |                                         |                        |               MIG M. |
 |=========================================+========================+======================|
 |   0  NVIDIA GeForce RTX 5060 Ti     On  |   00000000:01:00.0 Off |                  N/A |
-|  0%   34C    P8              4W /  180W |    4247MiB /  16311MiB |      0%      Default |
+|  0%   34C    P8              4W /  180W |    8343MiB /  16311MiB |      0%      Default |
 |                                         |                        |                  N/A |
 +-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A            3044      G   /usr/lib/xorg/Xorg                        4MiB |
+|    0   N/A  N/A           22818      C   ./add_cuda                              128MiB |
++-----------------------------------------------------------------------------------------+
+
 ```
 Then it goes back to counting towards the process memory:
 ```
