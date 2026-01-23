@@ -1,0 +1,6 @@
+sum_cpu
+sum_gpu
+*.sqlite
+add
+add_cuda
+*-rep
