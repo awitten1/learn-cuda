@@ -5,6 +5,7 @@
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
+#include <iostream>
 #include <random>
 #include <vector>
 
@@ -32,11 +33,15 @@ inline std::vector<float> gen_random_floats(std::size_t n, float min_val = 0.0f,
 }
 
 template <typename Callable>
-float timeit(Callable c)
+float timeit(const char* label, Callable c)
 {
   constexpr static auto& now = std::chrono::steady_clock::now;
   auto t1 = now();
   c();
   auto t2 = now();
-  return std::chrono::duration<float, std::milli>(t2 - t1).count();
+  float ms = std::chrono::duration<float, std::milli>(t2 - t1).count();
+  if (label && label[0] != '\0') {
+    std::cout << label << "=" << ms << "ms ";
+  }
+  return ms;
 }

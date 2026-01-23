@@ -27,11 +27,10 @@ int main(int argc, char** argv) {
 
     std::vector<float> data = gen_random_floats(n, 0.0f, 1.0f, seed);
     double result = 0.0;
-    float ms = timeit([&]() {
+    timeit("cpu_sum_ms", [&]() {
         result = sum(data.data(), data.size());
     });
 
     std::cout << "sum=" << result << std::endl;
-    std::cout << "time_ms=" << ms << std::endl;
     return 0;
 }

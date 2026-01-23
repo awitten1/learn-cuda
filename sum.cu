@@ -2,7 +2,11 @@
 #include <cstddef>
 #include <iostream>
 #include <string>
+#include <thread>
 #include <vector>
+#include <thrust/reduce.h>
+#include <thrust/device_ptr.h>
+#include <cuda/std/functional>
 
 #include <cuda_runtime.h>
 
@@ -47,7 +51,6 @@ int main(int argc, char** argv)
     device_loc.type = cudaMemLocationTypeDevice;
     device_loc.id = device;
     cudaMemPrefetchAsync(data, n * sizeof(float), device_loc, 0, 0);
-    cudaMemPrefetchAsync(device_sum, sizeof(double), device_loc, 0, 0);
 
     int block = 256;
     int grid = static_cast<int>((n + block - 1) / block);
@@ -55,20 +58,20 @@ int main(int argc, char** argv)
         grid = 1024;
     }
 
-    float ms = timeit([&]() {
+    timeit("kernel_sum_ms", [&]() {
         sum_kernel<<<grid, block>>>(data, n, device_sum);
         cudaDeviceSynchronize();
     });
+    std::cout << "kernel_sum=" << *device_sum << std::endl;
 
-    cudaMemLocation host_loc{};
-    host_loc.type = cudaMemLocationTypeHost;
-    host_loc.id = 0;
-    cudaMemPrefetchAsync(device_sum, sizeof(double), host_loc, 0, 0);
-    cudaDeviceSynchronize();
-
-    std::cout << "sum=" << *device_sum << std::endl;
-    std::cout << "time_ms=" << ms << std::endl;
-
+    thrust::device_ptr<float> d_begin = thrust::device_pointer_cast(data);
+    thrust::device_ptr<float> d_end = d_begin + n;
+    double thrust_sum = 0.0;
+    timeit("thrust_sum_ms", [&]() {
+        thrust_sum = thrust::reduce(d_begin, d_end, 0.0, cuda::std::plus<double>());
+    });
+    std::cout << "thrust_sum=" << thrust_sum << std::endl;
+    std::this_thread::sleep_for(std::chrono::seconds(30));
     cudaFree(data);
     cudaFree(device_sum);
     return 0;
