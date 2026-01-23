@@ -71,7 +71,7 @@ int main(int argc, char** argv)
         thrust_sum = thrust::reduce(d_begin, d_end, 0.0, cuda::std::plus<double>());
     });
     std::cout << "thrust_sum=" << thrust_sum << std::endl;
-    std::this_thread::sleep_for(std::chrono::seconds(30));
+    //std::this_thread::sleep_for(std::chrono::seconds(30));
     cudaFree(data);
     cudaFree(device_sum);
     return 0;

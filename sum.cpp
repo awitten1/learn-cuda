@@ -8,6 +8,9 @@
 
 double sum(float* buf, size_t n) {
     double ret = 0.0;
+#ifdef _OPENMP
+#pragma omp parallel for reduction(+ : ret)
+#endif
     for (size_t i = 0; i < n; ++i) {
         ret += buf[i];
     }
